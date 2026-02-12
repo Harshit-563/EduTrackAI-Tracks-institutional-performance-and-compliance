@@ -1,1 +1,4 @@
 doc_validator\.env
+doc_validator\__pycache__
+doc_validator/.env:1
+doc_validator\.env:1
