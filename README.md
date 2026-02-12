@@ -6,41 +6,53 @@
 
 
 
+                
                 ┌────────────────────────┐
                 │   Document Upload UI   │
                 └──────────┬─────────────┘
                            ↓
 ┌──────────────────────────────────────────────────┐
-│ LAYER 1: DOCUMENT TRUST & COMPLIANCE (Per-Doc)   │
+│ LAYER 1: DOCUMENT TRUST & COMPLIANCE (Per-Doc)  │
 │                                                  │
-│ OCR → Validation Rules → LLM Compliance Check    │
+│ OCR → Rule Validation → (Optional) LLM Assist   │
+│                                                  │
 │ Output:                                          │
-│  - is_valid_document                              │
-│  - compliance_status                              │
-│  - dss_score (0–100)                              │
-│  - flags                                         │
+│  - dss_score (0–100)                             │
+│  - classification (Valid / Review)               │
+│  - flags (explainable issues)                    │
 └──────────┬───────────────────────────────────────┘
-           ↓ (Aggregated)
+           ↓ (Aggregated per institution)
 ┌──────────────────────────────────────────────────┐
-│ LAYER 2: INSTITUTION COMPLIANCE SCORE (College)  │
+│ LAYER 2: INSTITUTION COMPLIANCE SCORING         │
 │                                                  │
-│ Aggregates all documents:                        │
-│  - Missing mandatory docs?                       │
-│  - Expired docs?                                 │
-│  - Avg DSS score                                 │
+│ Aggregates all document results:                 │
+│  - Missing mandatory documents?                  │
+│  - Expired / weak documents?                     │
+│  - Average DSS score                             │
+│                                                  │
 │ Output:                                          │
 │  - Compliance Index (0–100)                      │
+│  - Status (Compliant / Review Required)          │
 │  - Actionable reasons                            │
 └──────────┬───────────────────────────────────────┘
-           ↓ (Structured metrics)
+           ↓ (Structured institutional metrics)
 ┌──────────────────────────────────────────────────┐
-│ LAYER 3: RISK & FRAUD DETECTION (ML)              │
+│ LAYER 3: RISK & ANOMALY DETECTION (ML Layer)    │
 │                                                  │
-│ Isolation Forest / XGBoost / Rules               │
+│ Isolation Forest (unsupervised anomaly model)    │
+│                                                  │
+│ Evaluates:                                       │
+│  - Student–Faculty ratio                         │
+│  - Placement rate                                │
+│  - Infrastructure per student                    │
+│  - Compliance score                              │
+│                                                  │
 │ Output:                                          │
-│  - Risk score (0–100)                             │
+│  - Risk score (0–100)                            │
+│  - Risk status (Normal / High Risk)              │
 │  - Anomaly flags                                 │
 └──────────────────────────────────────────────────┘
+
 🏫 EduTrack — AI-Based Institutional Compliance & Risk System
 
 EduTrack is an AI-driven Decision Support System (DSS) that validates institutional documents, evaluates compliance, and detects risk using explainable scoring and anomaly detection.
@@ -250,5 +262,6 @@ Tesseract OCR
 pdf2image
 
 React (Frontend)
+
 
 
