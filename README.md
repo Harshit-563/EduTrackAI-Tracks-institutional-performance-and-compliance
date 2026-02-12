@@ -1,5 +1,11 @@
 
-<img width="1920" height="1000" alt="Screenshot 2025-12-02 231423" src="https://github.com/user-attachments/assets/ac4a76f2-7b05-43df-b2e2-349843c7814f" />
+<img width="1920" height="1019" alt="Screenshot 2025-12-02 231423" src="https://github.com/user-attachments/assets/bd34b6ba-f206-4826-99a3-12b54a5573a1" />
+<img width="1920" height="1039" alt="Screenshot 2025-12-03 1818441" src="https://github.com/user-attachments/assets/9688de50-c123-4883-a254-08ae337d993a" />
+
+
+
+
+
                 ┌────────────────────────┐
                 │   Document Upload UI   │
                 └──────────┬─────────────┘
@@ -244,4 +250,5 @@ Tesseract OCR
 pdf2image
 
 React (Frontend)
+
 
