@@ -6,13 +6,49 @@ from typing import Any, Dict
 from groq import Groq
 
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+def _load_env_files() -> None:
+    """
+    Load env vars from common local .env locations if present.
+    Existing process environment variables are not overwritten.
+    """
+    base_dir = os.path.dirname(__file__)
+    candidates = [
+        os.path.join(base_dir, ".env"),
+        os.path.join(os.path.dirname(base_dir), ".env"),
+    ]
+
+    for path in candidates:
+        if not os.path.exists(path):
+            continue
+
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                for raw in f:
+                    line = raw.strip()
+                    if not line or line.startswith("#") or "=" not in line:
+                        continue
+
+                    key, value = line.split("=", 1)
+                    key = key.strip()
+                    value = value.strip().strip('"').strip("'")
+
+                    if key and key not in os.environ:
+                        os.environ[key] = value
+        except Exception:
+            # Keep running; missing/invalid local .env should not crash import.
+            continue
 
 
 def _build_client() -> Groq:
-    if not GROQ_API_KEY:
-        raise RuntimeError("GROQ_API_KEY environment variable is not set")
-    return Groq(api_key=GROQ_API_KEY)
+    _load_env_files()
+    api_key = os.getenv("GROQ_API_KEY")
+
+    if not api_key:
+        raise RuntimeError(
+            "GROQ_API_KEY environment variable is not set (checked process env and local .env files)."
+        )
+
+    return Groq(api_key=api_key)
 
 
 def extract_json(text: str) -> Dict[str, Any]:
@@ -25,12 +61,10 @@ def extract_json(text: str) -> Dict[str, Any]:
 
     candidate = text.strip()
 
-    # Remove markdown code fences if present.
     fence_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", candidate, flags=re.DOTALL)
     if fence_match:
         candidate = fence_match.group(1)
 
-    # Keep only the outermost JSON object if extra text exists.
     start = candidate.find("{")
     end = candidate.rfind("}")
     if start != -1 and end != -1 and end >= start:
