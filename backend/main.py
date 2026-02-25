@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 import hashlib
+import csv
 import tempfile
 import os
 import sys
@@ -20,6 +21,11 @@ try:
 except Exception:
     run_ocr = None
     predict_from_ocr = None
+
+try:
+    from risk_engine import predict_risk
+except Exception:
+    predict_risk = None
 
 app = FastAPI(title="EduTrack Backend", version="0.1.0")
 
@@ -67,7 +73,67 @@ SUBMISSIONS: List[Dict[str, Any]] = [
             "auditor": "M/S K Sharma & Co.",
         },
     },
+    {
+        "id": "SUB-103",
+        "institution": "Metro College of Engineering",
+        "institution_id": "inst_metro",
+        "doc_type": "faculty_list",
+        "dss": 84,
+        "status": "parsed",
+        "uploaded_at": "2026-01-16",
+        "flags": [],
+        "extracted_fields": {
+            "faculty_count": 126,
+            "phd_count": 48,
+        },
+    },
+    {
+        "id": "SUB-104",
+        "institution": "Westbridge Institute",
+        "institution_id": "inst_west",
+        "doc_type": "affiliation_letter",
+        "dss": 96,
+        "status": "approved",
+        "uploaded_at": "2026-01-11",
+        "flags": [],
+        "extracted_fields": {
+            "affiliation_id": "UGC-AFF-2026-781",
+            "valid_till": "2028-03-31",
+        },
+    },
 ]
+
+# Used by rank-list calculation when risk model is available.
+INSTITUTION_PROFILES: Dict[str, Dict[str, float]] = {
+    "North Valley Institute": {
+        "Total_Students": 1200,
+        "Total_Faculty": 38,
+        "Placement_Rate": 62,
+        "Fund_Utilization": 78,
+        "Infrastructure_Area": 4200,
+    },
+    "Delta Technical Campus": {
+        "Total_Students": 1600,
+        "Total_Faculty": 30,
+        "Placement_Rate": 48,
+        "Fund_Utilization": 85,
+        "Infrastructure_Area": 3900,
+    },
+    "Metro College of Engineering": {
+        "Total_Students": 2100,
+        "Total_Faculty": 74,
+        "Placement_Rate": 71,
+        "Fund_Utilization": 80,
+        "Infrastructure_Area": 6400,
+    },
+    "Westbridge Institute": {
+        "Total_Students": 900,
+        "Total_Faculty": 42,
+        "Placement_Rate": 82,
+        "Fund_Utilization": 91,
+        "Infrastructure_Area": 4600,
+    },
+}
 
 TOKENS: Dict[str, Dict[str, str]] = {}
 
@@ -105,6 +171,96 @@ def _require_auth(authorization: Optional[str]) -> Dict[str, str]:
     if not token or token not in TOKENS:
         raise HTTPException(status_code=401, detail="Unauthorized")
     return TOKENS[token]
+
+
+def _fallback_risk_score(avg_dss: float, missing_docs: int) -> float:
+    # Fallback when trained risk model artifacts are unavailable.
+    base = 100.0 - avg_dss
+    penalty = min(30.0, missing_docs * 8.0)
+    return round(max(0.0, min(100.0, base + penalty)), 2)
+
+
+def _compute_institution_risk_score(institution_name: str, avg_dss: float, missing_docs: int) -> float:
+    if predict_risk is None:
+        return _fallback_risk_score(avg_dss, missing_docs)
+
+    profile = INSTITUTION_PROFILES.get(institution_name)
+    if not profile:
+        return _fallback_risk_score(avg_dss, missing_docs)
+
+    payload = {
+        **profile,
+        "Avg_Doc_DSS": avg_dss,
+        "Missing_Doc_Count": missing_docs,
+    }
+
+    try:
+        result = predict_risk(payload)
+        score = result.get("risk_score") if isinstance(result, dict) else None
+        if isinstance(score, (int, float)):
+            return round(float(score), 2)
+    except Exception:
+        pass
+
+    return _fallback_risk_score(avg_dss, missing_docs)
+
+
+def _build_institution_rank_list() -> List[Dict[str, Any]]:
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for row in SUBMISSIONS:
+        grouped.setdefault(row.get("institution", "Unknown"), []).append(row)
+
+    rank_rows: List[Dict[str, Any]] = []
+    for institution, rows in grouped.items():
+        dss_values = [float(r.get("dss", 0.0)) for r in rows]
+        avg_dss = round(sum(dss_values) / len(dss_values), 2) if dss_values else 0.0
+        missing_docs = sum(1 for r in rows if r.get("status") in {"needs_manual_review", "low_confidence"})
+
+        risk_score = _compute_institution_risk_score(institution, avg_dss, missing_docs)
+        rank_score = round((avg_dss + risk_score) / 2.0, 2)  # user-requested formula
+
+        rank_rows.append(
+            {
+                "institution": institution,
+                "avg_dss_score": avg_dss,
+                "risk_score": risk_score,
+                "rank_score": rank_score,
+                "submission_count": len(rows),
+            }
+        )
+
+    rank_rows.sort(key=lambda r: r["rank_score"], reverse=True)
+    for idx, row in enumerate(rank_rows, start=1):
+        row["rank"] = idx
+
+    return rank_rows
+
+
+def _load_rank_list_from_csv() -> List[Dict[str, Any]]:
+    csv_path = PROJECT_ROOT / "college_rank_list.csv"
+    if not csv_path.exists():
+        return []
+
+    rows: List[Dict[str, Any]] = []
+    with csv_path.open("r", encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        for raw in reader:
+            try:
+                rows.append(
+                    {
+                        "rank": int(float(raw.get("Rank", 0) or 0)),
+                        "institution": str(raw.get("College Name", "")).strip(),
+                        "avg_dss_score": round(float(raw.get("Avg_Doc_DSS", 0) or 0), 2),
+                        "risk_score": round(float(raw.get("Risk_Score", 0) or 0), 2),
+                        "rank_score": round(float(raw.get("Rank_Score", 0) or 0), 2),
+                        "submission_count": None,
+                    }
+                )
+            except Exception:
+                continue
+
+    rows.sort(key=lambda r: r.get("rank", 10**9))
+    return rows
 
 
 @app.get("/health")
@@ -269,3 +425,21 @@ def institution_dss_trend(
         {"year": "2026", "dss": 79},
     ]
 
+
+@app.get("/institutions/rank-list")
+def institutions_rank_list(authorization: Optional[str] = Header(default=None)) -> Dict[str, Any]:
+    _require_auth(authorization)
+    csv_rows = _load_rank_list_from_csv()
+    if csv_rows:
+        return {
+            "count": len(csv_rows),
+            "source": "college_rank_list.csv",
+            "items": csv_rows,
+        }
+
+    rows = _build_institution_rank_list()
+    return {
+        "count": len(rows),
+        "source": "computed_from_submissions",
+        "items": rows,
+    }

@@ -12,6 +12,7 @@ import ReviewerQueue from "./pages/ReviewerQueue";
 import ReviewDocument from "./pages/ReviewDocument";
 import InstituteDashboard from "./pages/InstituteDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import RankList from "./pages/RankList";
 
 export default function App() {
   return (
@@ -41,6 +42,11 @@ export default function App() {
         />
 
         <Route
+          path="/rank-list"
+          element={<ProtectedRoute><Layout><RankList /></Layout></ProtectedRoute>}
+        />
+
+        <Route
           path="/admin"
           element={<ProtectedRoute><Layout><AdminDashboard /></Layout></ProtectedRoute>}
         />
@@ -50,4 +56,5 @@ export default function App() {
     </AuthProvider>
   );
 }
+
 

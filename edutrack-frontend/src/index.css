@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0b1220;
-  --panel: #111a2e;
-  --text: #e5e7eb;
-  --muted: #94a3b8;
-  --accent: #22d3ee;
+  --bg: #0f1411;
+  --panel: #15211a;
+  --text: #ecf4ee;
+  --muted: #9bb3a3;
+  --accent: #7ee081;
 }
 
 html,
@@ -20,8 +20,8 @@ body {
   margin: 0;
   color: var(--text);
   background:
-    radial-gradient(1200px 600px at 10% -10%, #1d2d4d 0%, transparent 55%),
-    radial-gradient(900px 500px at 90% -20%, #16364a 0%, transparent 55%),
+    radial-gradient(1100px 560px at 8% -8%, #234333 0%, transparent 55%),
+    radial-gradient(900px 520px at 92% -18%, #4d3f21 0%, transparent 58%),
     var(--bg);
   font-family: Manrope, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   text-rendering: optimizeLegibility;
@@ -35,7 +35,7 @@ a {
 }
 
 ::selection {
-  background: rgba(34, 211, 238, 0.25);
+  background: rgba(126, 224, 129, 0.22);
   color: #f8fafc;
 }
 
@@ -44,13 +44,50 @@ a {
   outline-offset: 2px;
 }
 
-/* Keep transitions scoped; avoid global `all` transitions. */
 button,
 a,
 input,
 select,
 textarea {
-  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(14, 21, 16, 0.96) 0%, rgba(12, 18, 14, 0.93) 100%);
+}
+
+.panel {
+  border: 1px solid rgba(155, 179, 163, 0.22);
+  background: rgba(20, 31, 24, 0.62);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+}
+
+.panel-soft {
+  border: 1px solid rgba(155, 179, 163, 0.16);
+  background: rgba(20, 31, 24, 0.4);
+  border-radius: 12px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #7ee081 0%, #56c05a 100%);
+  color: #112014;
+  border: 1px solid rgba(126, 224, 129, 0.6);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(126, 224, 129, 0.25);
+}
+
+.btn-subtle {
+  border: 1px solid rgba(155, 179, 163, 0.34);
+  background: rgba(10, 16, 12, 0.35);
+}
+
+.btn-subtle:hover {
+  border-color: rgba(224, 186, 112, 0.62);
 }
 
 ::-webkit-scrollbar {
@@ -59,15 +96,15 @@ textarea {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #101712;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #3d5544;
   border-radius: 999px;
-  border: 2px solid #0f172a;
+  border: 2px solid #101712;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #4b6854;
 }
