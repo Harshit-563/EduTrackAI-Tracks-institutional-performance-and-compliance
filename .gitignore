@@ -5,7 +5,6 @@ doc_validator\.env:1
 college_data_v2.csv
 college_data_v3.csv
 college_data.csv
-college_rank_list.csv
 doc_validator\.env
 fire_cert.pdf
 generate_data.py
