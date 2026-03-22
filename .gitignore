@@ -8,7 +8,6 @@ college_data.csv
 doc_validator\.env
 fire_cert.pdf
 generate_data.py
-risk_model.pkl
 scaler.pkl
 college_aggregator.py
 test_fire_cert.jpg
@@ -16,4 +15,5 @@ package-lock.json
 __pycache__
 .env
 backend\__pycache__
-
+edutrack-frontend\node_modules
+edutrack-frontend\dist
