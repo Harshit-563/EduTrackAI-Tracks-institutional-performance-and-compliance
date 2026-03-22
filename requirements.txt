@@ -1,0 +1,56 @@
+# EduTrack Project - Python Dependencies
+# Core Framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+pydantic[email]==2.0.0
+python-dotenv==1.0.0
+
+# Data Processing & Analysis
+pandas>=2.0.0
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Machine Learning
+scikit-learn>=1.3.0
+joblib>=1.3.0
+
+# Data Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.14.0
+
+# Document Processing & OCR
+Pillow>=10.0.0
+pytesseract>=0.3.10
+
+# Development & Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.7.0
+flake8>=6.0.0
+isort>=5.12.0
+
+# Utilities
+requests>=2.31.0
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+aiofiles>=23.1.0
+
+# Jupyter & Notebooks (Optional but recommended)
+jupyter>=1.0.0
+ipython>=8.14.0
+notebook>=6.5.0
+
+# Logging & Monitoring
+python-json-logger>=2.0.7
+
+# Database (Future use)
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0  # PostgreSQL adapter
+
+# API Documentation
+python-multipart>=0.0.9
+
+# Performance
+gunicorn>=21.2.0
