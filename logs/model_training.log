@@ -1,0 +1,71 @@
+2026-03-22 22:36:44,481 - INFO - ============================================================
+2026-03-22 22:36:44,481 - INFO - EDUTRACK ML MODEL TRAINING PIPELINE
+2026-03-22 22:36:44,482 - INFO - ============================================================
+2026-03-22 22:36:44,482 - INFO - Loading features from data/processed/college_data_features.csv
+2026-03-22 22:36:44,599 - INFO - Loaded 4,831 records with 31 features
+2026-03-22 22:36:44,600 - INFO - [RISK MODEL] Preparing data...
+2026-03-22 22:36:44,607 - INFO - Features: 10 | Target: Risk Classification
+2026-03-22 22:36:44,609 - INFO - Class distribution: {0: 3762, 1: 1069}
+2026-03-22 22:36:44,631 - INFO - 
+[TRAINING] Risk Classification Model
+2026-03-22 22:36:44,631 - INFO - ============================================================
+2026-03-22 22:36:44,648 - INFO - Training set: 3,864 | Test set: 967
+2026-03-22 22:36:45,705 - INFO - 
+RandomForest:
+2026-03-22 22:36:45,706 - INFO -   ROC-AUC: 1.0000
+2026-03-22 22:36:45,706 - INFO -   F1-Score: 1.0000
+2026-03-22 22:36:46,687 - INFO - 
+GradientBoosting:
+2026-03-22 22:36:46,688 - INFO -   ROC-AUC: 1.0000
+2026-03-22 22:36:46,688 - INFO -   F1-Score: 1.0000
+2026-03-22 22:36:46,742 - INFO - 
+LogisticRegression:
+2026-03-22 22:36:46,742 - INFO -   ROC-AUC: 1.0000
+2026-03-22 22:36:46,743 - INFO -   F1-Score: 0.9977
+2026-03-22 22:36:46,743 - INFO - 
+[BEST MODEL] RandomForest (ROC-AUC: 1.0000)
+2026-03-22 22:36:46,757 - INFO - Saved: models\trained_models\risk_model.pkl
+2026-03-22 22:36:46,757 - INFO - [PERFORMANCE MODEL] Preparing data...
+2026-03-22 22:36:46,779 - INFO - Features: 10 | Target: Performance Tiers
+2026-03-22 22:36:46,782 - INFO - Class distribution: {'Average': 2523, 'Good': 2237, 'Critical': 46, 'Excellent': 25}
+2026-03-22 22:36:46,783 - INFO - 
+[TRAINING] Performance Classification Model
+2026-03-22 22:36:46,783 - INFO - ============================================================
+2026-03-22 22:36:46,806 - INFO - Training set: 3,864 | Test set: 967
+2026-03-22 22:36:46,806 - INFO - Classes: ['Average' 'Critical' 'Excellent' 'Good']
+2026-03-22 22:36:47,537 - INFO - Model: RandomForest
+2026-03-22 22:36:47,537 - INFO - Accuracy: 0.9545
+2026-03-22 22:36:47,538 - INFO - 
+Classification Report:
+2026-03-22 22:36:47,557 - INFO -               precision    recall  f1-score   support
+
+     Average       0.96      0.96      0.96       505
+    Critical       0.88      0.78      0.82         9
+   Excellent       1.00      0.40      0.57         5
+        Good       0.95      0.96      0.95       448
+
+    accuracy                           0.95       967
+   macro avg       0.95      0.77      0.83       967
+weighted avg       0.95      0.95      0.95       967
+
+2026-03-22 22:36:47,575 - INFO - Saved: models\trained_models\performance_model.pkl
+2026-03-22 22:36:47,575 - INFO - [RISK MODEL] Preparing data...
+2026-03-22 22:36:47,581 - INFO - Features: 10 | Target: Risk Classification
+2026-03-22 22:36:47,583 - INFO - Class distribution: {0: 3762, 1: 1069}
+2026-03-22 22:36:47,583 - INFO - 
+[TRAINING] Anomaly Detection Model (Isolation Forest)
+2026-03-22 22:36:47,583 - INFO - ============================================================
+2026-03-22 22:36:48,121 - INFO - Anomalies detected: 242 (5.01%)
+2026-03-22 22:36:48,162 - INFO - Saved: models\trained_models\anomaly_model.pkl
+2026-03-22 22:36:48,164 - INFO - Saved scaler: models\trained_models\risk_scaler.pkl
+2026-03-22 22:36:48,165 - INFO - Saved scaler: models\trained_models\performance_scaler.pkl
+2026-03-22 22:36:48,166 - INFO - Saved scaler: models\trained_models\anomaly_scaler.pkl
+2026-03-22 22:36:48,169 - INFO - Saved encoder: models\trained_models\performance_encoder.pkl
+2026-03-22 22:36:48,169 - INFO - 
+============================================================
+2026-03-22 22:36:48,169 - INFO - MODEL TRAINING SUMMARY
+2026-03-22 22:36:48,169 - INFO - ============================================================
+2026-03-22 22:36:48,169 - INFO - Models trained: 3
+2026-03-22 22:36:48,176 - INFO - 
+Models saved to: models\trained_models
+2026-03-22 22:36:48,177 - INFO - ============================================================

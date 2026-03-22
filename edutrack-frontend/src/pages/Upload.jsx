@@ -1,165 +1,228 @@
-// src/pages/Upload.jsx
-import React, { useState, useEffect } from "react";
-import FileUploader from "../components/FileUploader";
-import client from "../api/api";
+import React, { useState } from "react";
+import { Upload as UploadIcon, File, CheckCircle, AlertCircle, Loader } from "lucide-react";
 
 export default function Upload() {
-  const [uploadResult, setUploadResult] = useState(null);
-  const [history, setHistory] = useState([]);
-  const [loadingHistory, setLoadingHistory] = useState(true);
+  const [dragActive, setDragActive] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
 
-  // Fetch previous submissions (mock fallback)
-  useEffect(() => {
-    async function fetchHistory() {
-      try {
-        const response = await client.get("/institutions/demo/submissions");
+  const handleDrag = (e) => {
+    e.preventDefault();
+    setDragActive(e.type === "dragenter" || e.type === "dragover");
+  };
 
-        if (Array.isArray(response.data)) {
-          setHistory(response.data);
-        } else {
-          setHistory([]);
-        }
-      } catch (err) {
-        console.warn("Backend history not found → using fallback data.");
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragActive(false);
+    const newFiles = Array.from(e.dataTransfer.files);
+    setFiles([...files, ...newFiles]);
+  };
 
-        setHistory([
-          {
-            id: "H001",
-            name: "fire_safety.pdf",
-            uploaded_at: "2024-11-01",
-            status: "parsed",
-            dss: 92,
-          },
-          {
-            id: "H002",
-            name: "audit_report_2023.pdf",
-            uploaded_at: "2024-10-12",
-            status: "needs_review",
-            dss: 55,
-          },
-        ]);
-      } finally {
-        setLoadingHistory(false);
-      }
-    }
+  const handleFileSelect = (e) => {
+    setFiles([...files, ...Array.from(e.target.files)]);
+  };
 
-    fetchHistory();
-  }, []);
+  const handleUpload = async () => {
+    if (files.length === 0) return;
+    
+    setUploading(true);
+    // Simulate processing each file
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const processedFiles = files.map((file, idx) => ({
+      id: Date.now() + idx,
+      name: file.name,
+      size: (file.size / 1024 / 1024).toFixed(2),
+      uploadedAt: new Date().toLocaleDateString(),
+      status: "processed",
+      dss: Math.floor(Math.random() * 40 + 60), // 60-100 DSS
+    }));
+    
+    setUploadedFiles([...processedFiles, ...uploadedFiles]);
+    setFiles([]);
+    setUploading(false);
+  };
 
-  // When FileUploader returns backend result
-  function handleUpload(data) {
-    setUploadResult(data);
-
-    // Push into history visually
-    setHistory((prev) => [
-      {
-        id: data?.submission_id || "new",
-        name: data?.file_name || "uploaded_document.pdf",
-        uploaded_at: new Date().toLocaleDateString(),
-        status: "processing",
-        dss: data?.dss || 0,
-      },
-      ...prev,
-    ]);
-  }
+  const removeFile = (idx) => {
+    setFiles(files.filter((_, i) => i !== idx));
+  };
 
   return (
-    <div className="min-h-screen text-gray-200 p-8 bg-[#0f1720]">
-
-      <h1 className="text-3xl font-bold mb-2">Upload Documents</h1>
-      <p className="text-gray-400 text-sm mb-6">
-        Upload mandatory compliance documents. The AI engine will extract key fields and compute the Document Sufficiency Score (DSS).
-      </p>
-
-      {/* Upload box */}
-      <div className="mb-10">
-        <FileUploader onResult={handleUpload} />
-      </div>
-
-      {/* Result Panel */}
-      {uploadResult && (
-        <div className="bg-gray-900/20 border border-gray-800 rounded p-5 mb-10">
-
-          <h2 className="text-xl font-semibold mb-4">Analysis Summary</h2>
-
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="bg-gray-800/50 p-4 rounded border border-gray-700">
-              <span className="text-gray-400 text-sm">DSS Score</span>
-              <div className="text-3xl font-bold">{uploadResult.dss || "—"}</div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-gradient-primary rounded-lg">
+              <UploadIcon className="w-6 h-6 text-white" />
             </div>
-
-            <div className="bg-gray-800/50 p-4 rounded border border-gray-700">
-              <span className="text-gray-400 text-sm">Compliance</span>
-              <div className="text-3xl font-bold">{uploadResult.compliance || "—"}</div>
-            </div>
-
-            <div className="bg-gray-800/50 p-4 rounded border border-gray-700">
-              <span className="text-gray-400 text-sm">Submission ID</span>
-              <div className="text-xl">{uploadResult.submission_id || "—"}</div>
-            </div>
+            <h1 className="text-3xl font-bold text-white">Document Upload</h1>
           </div>
-
-          {/* JSON extracted fields */}
-          <div className="mt-6">
-            <h3 className="font-semibold mb-2 text-lg">Extracted Fields</h3>
-            <pre className="p-3 bg-black/30 text-sm rounded overflow-auto max-h-64 border border-gray-700">
-{JSON.stringify(uploadResult.extracted_fields || uploadResult.fields || {}, null, 2)}
-            </pre>
-          </div>
-
-          {/* Flags */}
-          <div className="mt-6">
-            <h3 className="font-semibold mb-2 text-lg">AI Flags</h3>
-            <ul className="list-disc ml-5 text-gray-300 text-sm">
-              {(uploadResult.flags || ["No issues detected"]).map((f, i) => (
-                <li key={i}>{f}</li>
-              ))}
-            </ul>
-          </div>
-
+          <p className="text-slate-400">Upload institutional documents for compliance review and DSS scoring</p>
         </div>
-      )}
 
-      {/* Upload History */}
-      <div>
-        <h2 className="text-2xl font-bold mb-3">Recent Uploads</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Upload Area */}
+          <div className="lg:col-span-2">
+            <div
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+              className={`border-2 border-dashed rounded-xl p-12 text-center transition ${
+                dragActive
+                  ? "border-primary bg-primary/10"
+                  : "border-slate-600/40 bg-slate-800/20 hover:border-slate-500"
+              }`}
+            >
+              <UploadIcon className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-white mb-2">Drag & Drop Documents</h3>
+              <p className="text-slate-400 mb-6">or click to select files</p>
+              <input
+                type="file"
+                id="file-input"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+                accept=".pdf,.doc,.docx,.xls,.xlsx"
+              />
+              <label
+                htmlFor="file-input"
+                className="inline-block px-8 py-3 bg-gradient-primary hover:shadow-lg hover:shadow-primary/50 text-white rounded-lg font-semibold cursor-pointer transition"
+              >
+                Browse Files
+              </label>
+              <p className="text-slate-500 text-sm mt-4">PDF, DOC, DOCX, XLS supported (Max 50MB)</p>
+            </div>
 
-        <div className="bg-gray-900/10 border border-gray-800 p-4 rounded">
-          {loadingHistory ? (
-            <div className="text-gray-500 text-center py-6">Loading history...</div>
-          ) : history.length === 0 ? (
-            <div className="text-gray-400 text-sm">No uploads yet.</div>
-          ) : (
-            <ul className="space-y-4">
-              {history.map((item) => (
-                <li key={item.id} className="flex justify-between items-center p-3 bg-gray-900/20 rounded border border-gray-800">
-                  <div>
-                    <div className="font-medium">{item.name}</div>
-                    <div className="text-xs text-gray-400">{item.uploaded_at}</div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-300">DSS: {item.dss}</span>
-
-                    <span
-                      className={`px-2 py-1 rounded text-xs ${
-                        item.status === "parsed"
-                          ? "bg-green-700"
-                          : item.status === "needs_review"
-                          ? "bg-yellow-600"
-                          : "bg-gray-700"
-                      }`}
+            {/* Selected Files */}
+            {files.length > 0 && (
+              <div className="mt-8 bg-slate-800/40 backdrop-blur-sm border border-slate-700/40 rounded-xl p-6">
+                <h3 className="text-lg font-bold text-white mb-4">
+                  Ready to Upload ({files.length})
+                </h3>
+                <div className="space-y-3 mb-6">
+                  {files.map((file, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-4 bg-slate-700/20 rounded-lg border border-slate-700/40 hover:border-slate-600/60 transition"
                     >
-                      {item.status}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                      <div className="flex items-center gap-3">
+                        <File className="w-5 h-5 text-primary" />
+                        <div className="text-left">
+                          <p className="text-slate-300 font-medium">{file.name}</p>
+                          <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => removeFile(idx)}
+                        className="text-slate-500 hover:text-red-400 transition"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={handleUpload}
+                  disabled={uploading}
+                  className="w-full py-3 bg-gradient-primary hover:shadow-lg hover:shadow-primary/50 disabled:opacity-60 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2"
+                >
+                  {uploading ? (
+                    <>
+                      <Loader className="w-4 h-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <UploadIcon className="w-4 h-4" />
+                      Upload All Files
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
 
+            {/* Uploaded Files History */}
+            {uploadedFiles.length > 0 && (
+              <div className="mt-8 bg-slate-800/40 backdrop-blur-sm border border-slate-700/40 rounded-xl p-6">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  Upload History ({uploadedFiles.length})
+                </h3>
+                <div className="space-y-3">
+                  {uploadedFiles.map((file) => (
+                    <div key={file.id} className="p-4 bg-slate-700/20 rounded-lg border border-slate-700/40">
+                      <div className="flex items-start justify-between">
+                        <div className="flex gap-3 flex-1">
+                          <div className="p-2 bg-green-500/20 rounded-lg h-fit">
+                            <CheckCircle className="w-4 h-4 text-green-400" />
+                          </div>
+                          <div>
+                            <p className="text-slate-300 font-medium">{file.name}</p>
+                            <p className="text-xs text-slate-500">{file.uploadedAt} • {file.size} MB</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-green-400">{file.dss}</p>
+                          <p className="text-xs text-slate-500">DSS</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Info Sidebar */}
+          <div className="space-y-6">
+            <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/40 rounded-xl p-6">
+              <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                Requirements
+              </h3>
+              <ul className="space-y-3 text-sm text-slate-400">
+                <li className="flex gap-3">
+                  <span className="text-green-400 flex-shrink-0">✓</span>
+                  <span>Valid institutional documents</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-green-400 flex-shrink-0">✓</span>
+                  <span>PDF, Word, or Excel format</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-green-400 flex-shrink-0">✓</span>
+                  <span>Max 50 MB per file</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-green-400 flex-shrink-0">✓</span>
+                  <span>Clear, readable content</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-gradient-primary/10 border border-primary/30 rounded-xl p-6">
+              <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-yellow-400" />
+                About DSS
+              </h3>
+              <p className="text-sm text-slate-300">
+                Document Sufficiency Score (DSS) indicates the completeness and quality of your submission (0-100).
+              </p>
+            </div>
+
+            <div className="bg-slate-700/20 border border-slate-700/40 rounded-xl p-6">
+              <p className="text-sm text-slate-400">
+                💡 Tip: Upload all mandatory documents together for accurate compliance verification.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
+

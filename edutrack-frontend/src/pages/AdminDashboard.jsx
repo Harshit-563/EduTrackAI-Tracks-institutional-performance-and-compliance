@@ -1,150 +1,174 @@
-import React, { useMemo } from "react";
+import React, { useState } from "react";
+import { Users, Building2, FileCheck, AlertTriangle, TrendingUp, BarChart3 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
-const KPI_DATA = [
-  { label: "Institutions", value: 128, note: "Active this cycle" },
-  { label: "Pending Reviews", value: 46, note: "Across all reviewers" },
-  { label: "Avg DSS", value: 74, note: "Last 30 days" },
-  { label: "High Risk", value: 9, note: "Needs escalation" },
+const INSTITUTIONS_DATA = [
+  { name: "Demo Tech", dss: 78, compliance: 74, status: "active" },
+  { name: "State University", dss: 85, compliance: 82, status: "active" },
+  { name: "Tech Institute", dss: 62, compliance: 58, status: "warning" },
+  { name: "College of Arts", dss: 71, compliance: 68, status: "active" },
+  { name: "Engineering College", dss: 88, compliance: 86, status: "active" },
 ];
 
-const REVIEWER_STATS = [
-  { name: "Ritika Sharma", assigned: 22, closed: 17, avg_turnaround: "9h", quality: "High" },
-  { name: "Anil Verma", assigned: 18, closed: 14, avg_turnaround: "12h", quality: "Medium" },
-  { name: "Sara Khan", assigned: 16, closed: 15, avg_turnaround: "7h", quality: "High" },
-  { name: "Mohan Iyer", assigned: 13, closed: 10, avg_turnaround: "14h", quality: "Medium" },
+const SUBMISSION_STATUS = [
+  { name: "Approved", value: 45, color: "#10b981" },
+  { name: "Review", value: 18, color: "#3b82f6" },
+  { name: "Needs Update", value: 12, color: "#f59e0b" },
+  { name: "Rejected", value: 5, color: "#ef4444" },
 ];
 
-const INSTITUTION_RISK = [
-  { institution: "North Valley Institute", health_score: 82, risk: "Low", pending: 2 },
-  { institution: "Delta Technical Campus", health_score: 54, risk: "High", pending: 6 },
-  { institution: "Metro College of Engineering", health_score: 71, risk: "Medium", pending: 3 },
-  { institution: "Westbridge Institute", health_score: 88, risk: "Low", pending: 1 },
-  { institution: "Sunrise Polytechnic", health_score: 61, risk: "Medium", pending: 4 },
+const PERFORMANCE_DATA = [
+  { month: "Jan", submissions: 15, approvals: 12 },
+  { month: "Feb", submissions: 22, approvals: 18 },
+  { month: "Mar", submissions: 28, approvals: 25 },
+  { month: "Apr", submissions: 24, approvals: 21 },
+  { month: "May", submissions: 32, approvals: 29 },
+  { month: "Jun", submissions: 38, approvals: 35 },
 ];
 
-function RiskPill({ risk }) {
-  const klass =
-    risk === "Low"
-      ? "bg-emerald-700/80"
-      : risk === "Medium"
-      ? "bg-amber-700/80"
-      : "bg-rose-700/80";
-
-  return <span className={`px-2 py-1 rounded text-xs text-white ${klass}`}>{risk}</span>;
-}
+const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444"];
 
 export default function AdminDashboard() {
-  const totals = useMemo(() => {
-    const totalAssigned = REVIEWER_STATS.reduce((acc, r) => acc + r.assigned, 0);
-    const totalClosed = REVIEWER_STATS.reduce((acc, r) => acc + r.closed, 0);
-    const completion = totalAssigned ? Math.round((totalClosed / totalAssigned) * 100) : 0;
-    return { totalAssigned, totalClosed, completion };
-  }, []);
+  const [stats] = useState({
+    totalInstitutions: 12,
+    activeSubmissions: 80,
+    avgDss: 76,
+    systemHealth: 98,
+  });
 
   return (
-    <div className="min-h-screen bg-[#0f1720] text-gray-100 p-6 md:p-8">
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-3xl font-semibold">Admin Dashboard</h1>
-          <p className="text-sm text-gray-400 mt-1">System-wide view of compliance throughput, reviewer productivity, and institutional risk.</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-gradient-primary rounded-lg">
+              <Users className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
+          </div>
+          <p className="text-slate-400">System-wide compliance and performance monitoring</p>
         </div>
-      </div>
 
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 mb-6">
-        {KPI_DATA.map((item) => (
-          <section key={item.label} className="rounded-xl border border-slate-800 bg-slate-900/35 p-4">
-            <div className="text-xs uppercase tracking-wide text-slate-400">{item.label}</div>
-            <div className="text-2xl md:text-3xl font-semibold mt-2">{item.value}</div>
-            <p className="text-xs text-slate-500 mt-1">{item.note}</p>
-          </section>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-6">
-        <section className="xl:col-span-2 rounded-xl border border-slate-800 bg-slate-900/35 p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold">Reviewer Performance</h2>
-            <span className="text-xs text-slate-400">Completion: {totals.completion}%</span>
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/40 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-slate-400 text-sm">Total Institutions</p>
+              <Building2 className="w-5 h-5 text-blue-400" />
+            </div>
+            <p className="text-3xl font-bold text-blue-400">{stats.totalInstitutions}</p>
+            <p className="text-xs text-slate-500 mt-2">Active members</p>
           </div>
 
+          <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/40 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-slate-400 text-sm">Active Submissions</p>
+              <FileCheck className="w-5 h-5 text-green-400" />
+            </div>
+            <p className="text-3xl font-bold text-green-400">{stats.activeSubmissions}</p>
+            <p className="text-xs text-slate-500 mt-2">Under processing</p>
+          </div>
+
+          <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/40 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-slate-400 text-sm">Avg DSS Score</p>
+              <TrendingUp className="w-5 h-5 text-purple-400" />
+            </div>
+            <p className="text-3xl font-bold text-purple-400">{stats.avgDss}</p>
+            <p className="text-xs text-slate-500 mt-2">Document sufficiency</p>
+          </div>
+
+          <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/40 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-slate-400 text-sm">System Health</p>
+              <AlertTriangle className="w-5 h-5 text-green-400" />
+            </div>
+            <p className="text-3xl font-bold text-green-400">{stats.systemHealth}%</p>
+            <p className="text-xs text-slate-500 mt-2">Operational</p>
+          </div>
+        </div>
+
+        {/* Charts Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Performance Chart */}
+          <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/40 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-primary" />
+              Submissions & Approvals Trend
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={PERFORMANCE_DATA}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                <XAxis dataKey="month" stroke="#cbd5e1" />
+                <YAxis stroke="#cbd5e1" />
+                <Tooltip contentStyle={{ backgroundColor: "#1e293b", border: "1px solid #475569" }} />
+                <Legend />
+                <Bar dataKey="submissions" fill="#5b6ee1" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="approvals" fill="#10b981" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Submission Status */}
+          <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/40 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-white mb-4">Submission Status Distribution</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie data={SUBMISSION_STATUS} cx="50%" cy="50%" labelLine={false} label={({ name, value }) => `${name}: ${value}`} outerRadius={80} fill="#8884d8" dataKey="value">
+                  {SUBMISSION_STATUS.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Institutions Table */}
+        <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/40 rounded-xl p-6">
+          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <Building2 className="w-5 h-5 text-primary" />
+            Institution Performance
+          </h3>
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
+            <table className="w-full">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-slate-400 border-b border-slate-800">
-                  <th className="px-3 py-2">Reviewer</th>
-                  <th className="px-3 py-2">Assigned</th>
-                  <th className="px-3 py-2">Closed</th>
-                  <th className="px-3 py-2">Avg Turnaround</th>
-                  <th className="px-3 py-2">Quality</th>
+                <tr className="border-b border-slate-700/40">
+                  <th className="text-left px-4 py-3 text-slate-400 text-sm font-semibold">Institution</th>
+                  <th className="text-left px-4 py-3 text-slate-400 text-sm font-semibold">DSS Score</th>
+                  <th className="text-left px-4 py-3 text-slate-400 text-sm font-semibold">Compliance</th>
+                  <th className="text-left px-4 py-3 text-slate-400 text-sm font-semibold">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {REVIEWER_STATS.map((row) => (
-                  <tr key={row.name} className="border-b border-slate-800/70 hover:bg-slate-800/20">
-                    <td className="px-3 py-3 font-medium">{row.name}</td>
-                    <td className="px-3 py-3">{row.assigned}</td>
-                    <td className="px-3 py-3">{row.closed}</td>
-                    <td className="px-3 py-3">{row.avg_turnaround}</td>
-                    <td className="px-3 py-3">{row.quality}</td>
+                {INSTITUTIONS_DATA.map((inst, idx) => (
+                  <tr key={idx} className="border-b border-slate-700/20 hover:bg-slate-700/10 transition">
+                    <td className="px-4 py-3 text-slate-300">{inst.name}</td>
+                    <td className="px-4 py-3">
+                      <span className="text-lg font-bold text-primary">{inst.dss}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-full bg-slate-700 rounded-full h-2 max-w-xs">
+                          <div className="bg-primary h-2 rounded-full" style={{ width: `${inst.compliance}%` }}></div>
+                        </div>
+                        <span className="text-sm text-slate-400">{inst.compliance}%</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${inst.status === "active" ? "bg-green-500/20 text-green-300" : "bg-yellow-500/20 text-yellow-300"}`}>
+                        {inst.status}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </section>
-
-        <section className="rounded-xl border border-slate-800 bg-slate-900/35 p-4">
-          <h2 className="text-lg font-semibold mb-3">Ops Snapshot</h2>
-          <ul className="space-y-3 text-sm">
-            <li className="flex justify-between border-b border-slate-800/70 pb-2">
-              <span className="text-slate-400">Review Backlog</span>
-              <span className="font-medium">46</span>
-            </li>
-            <li className="flex justify-between border-b border-slate-800/70 pb-2">
-              <span className="text-slate-400">Escalated Cases</span>
-              <span className="font-medium">12</span>
-            </li>
-            <li className="flex justify-between border-b border-slate-800/70 pb-2">
-              <span className="text-slate-400">Model Drift Alerts</span>
-              <span className="font-medium">2</span>
-            </li>
-            <li className="flex justify-between">
-              <span className="text-slate-400">SLA Breach Risk</span>
-              <span className="font-medium">Medium</span>
-            </li>
-          </ul>
-        </section>
+        </div>
       </div>
-
-      <section className="rounded-xl border border-slate-800 bg-slate-900/35 p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold">Institution Risk Monitor</h2>
-          <span className="text-xs text-slate-400">Health score derived from DSS + performance signals</span>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="text-left text-xs uppercase tracking-wide text-slate-400 border-b border-slate-800">
-                <th className="px-3 py-2">Institution</th>
-                <th className="px-3 py-2">Health Score</th>
-                <th className="px-3 py-2">Risk</th>
-                <th className="px-3 py-2">Pending Docs</th>
-              </tr>
-            </thead>
-            <tbody>
-              {INSTITUTION_RISK.map((item) => (
-                <tr key={item.institution} className="border-b border-slate-800/70 hover:bg-slate-800/20">
-                  <td className="px-3 py-3 font-medium">{item.institution}</td>
-                  <td className="px-3 py-3">{item.health_score}</td>
-                  <td className="px-3 py-3"><RiskPill risk={item.risk} /></td>
-                  <td className="px-3 py-3">{item.pending}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
     </div>
   );
 }

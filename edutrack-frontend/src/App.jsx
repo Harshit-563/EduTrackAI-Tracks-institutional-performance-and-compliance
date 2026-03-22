@@ -7,6 +7,8 @@ import { AuthProvider } from "./contexts/AuthContext";
 
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Analytics from "./pages/Analytics";
 import Upload from "./pages/Upload";
 import ReviewerQueue from "./pages/ReviewerQueue";
 import ReviewDocument from "./pages/ReviewDocument";
@@ -20,6 +22,9 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Layout><Landing /></Layout>} />
         <Route path="/login" element={<Login />} />
+        
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/analytics" element={<Analytics />} />
 
         <Route
           path="/upload"

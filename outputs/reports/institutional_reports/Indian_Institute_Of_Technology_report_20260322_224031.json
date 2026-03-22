@@ -1,0 +1,84 @@
+{
+  "header": {
+    "generated_date": "2026-03-22T22:40:31.208512",
+    "report_type": "Institutional Evaluation Report",
+    "system": "EduTrack"
+  },
+  "executive_summary": {
+    "college_name": "Indian Institute Of Technology Bhilai",
+    "state": "Chhattisgarh",
+    "city": "Bhilai",
+    "college_type": "Public/Government",
+    "report_date": "2026-03-22",
+    "report_time": "22:40:31",
+    "metrics": {
+      "total_students": 401,
+      "total_faculty": 36,
+      "student_faculty_ratio": 11.14,
+      "placement_rate": 92.22,
+      "average_fees": 465500,
+      "fund_utilization": 93.06,
+      "infrastructure_area": 432.0
+    },
+    "scores": {
+      "overall_performance_score": 87.48,
+      "faculty_adequacy": 92.57,
+      "placement_category": "Excellent",
+      "infrastructure_quality": 61.55,
+      "financial_efficiency": 93.06,
+      "avg_doc_dss": 98.22,
+      "dss_category": "Excellent",
+      "document_completeness": 100.0
+    }
+  },
+  "risk_assessment": {
+    "risk_level": "LOW RISK",
+    "risk_color": "Green",
+    "overall_score": 87.48,
+    "compliance_risk": "NO",
+    "missing_documents": 0,
+    "recommendations": [
+      "Institution performing well; maintain current trajectory"
+    ]
+  },
+  "performance_analysis": {
+    "overall_performance_score": 87.48,
+    "placement_rate": 92.22,
+    "percentile_overall": 99.9,
+    "percentile_placement": 98.6,
+    "state_rank": 57,
+    "state_rank_total": 57,
+    "national_rank": "4828",
+    "national_rank_total": 4831,
+    "performance_trend": "Stable"
+  },
+  "detailed_metrics": {
+    "academic_metrics": {
+      "student_faculty_ratio": 11.14,
+      "faculty_adequacy_score": 92.57,
+      "total_students": 401,
+      "total_faculty": 36,
+      "placement_rate": 92.22,
+      "placement_category": "Excellent"
+    },
+    "infrastructure_metrics": {
+      "campus_size": "432 Acres",
+      "infrastructure_area": 432.0,
+      "infrastructure_quality_score": 61.55,
+      "infrastructure_per_student": 1.08
+    },
+    "financial_metrics": {
+      "average_fees": 465500,
+      "fee_category": "High",
+      "fund_utilization": 93.06,
+      "financial_efficiency_score": 93.06
+    },
+    "compliance_metrics": {
+      "avg_doc_dss": 98.22,
+      "dss_category": "Excellent",
+      "missing_documents": 0,
+      "document_completeness": 100.0,
+      "high_compliance_risk": "NO"
+    }
+  }
+}

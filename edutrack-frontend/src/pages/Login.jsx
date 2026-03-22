@@ -64,23 +64,74 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f1720] text-gray-100 flex items-center justify-center px-4">
-      <form onSubmit={onSubmit} className="w-full max-w-md bg-gray-900/30 border border-gray-800 rounded-xl p-6">
-        <h1 className="text-xl font-semibold mb-1">Sign In</h1>
-        <p className="text-sm text-gray-400 mb-4">Backend auth enabled. Dummy fallback is available for local testing.</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-primary rounded-lg mb-4 mx-auto">
+            <span className="text-xl font-bold text-white">⚡</span>
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">EduTrack</h1>
+          <p className="text-slate-400">Institutional Evaluation System</p>
+        </div>
 
-        <label className="text-sm">Email</label>
-        <input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full mt-1 mb-3 px-3 py-2 rounded bg-black/20 border border-gray-700" />
+        {/* Login Form */}
+        <form onSubmit={onSubmit} className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/40 rounded-xl p-8">
+          <h2 className="text-xl font-bold text-white mb-2">Sign In</h2>
+          <p className="text-sm text-slate-400 mb-6">Use demo credentials below or connect to backend</p>
 
-        <label className="text-sm">Password</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full mt-1 mb-4 px-3 py-2 rounded bg-black/20 border border-gray-700" />
+          {/* Email */}
+          <div className="mb-5">
+            <label className="block text-sm font-semibold text-slate-300 mb-2">Email Address</label>
+            <input 
+              type="email"
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              className="w-full px-4 py-2.5 bg-slate-700/40 border border-slate-600/40 rounded-lg text-white text-sm focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition"
+              placeholder="user@example.com"
+            />
+          </div>
 
-        {error && <div className="text-sm text-red-400 mb-3">{error}</div>}
+          {/* Password */}
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-slate-300 mb-2">Password</label>
+            <input 
+              type="password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              className="w-full px-4 py-2.5 bg-slate-700/40 border border-slate-600/40 rounded-lg text-white text-sm focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition"
+              placeholder="••••••••"
+            />
+          </div>
 
-        <button type="submit" disabled={loading} className="w-full py-2 rounded bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60">
-          {loading ? "Signing in..." : "Login"}
-        </button>
-      </form>
+          {/* Error Alert */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+              <p className="text-sm text-red-300">{error}</p>
+            </div>
+          )}
+
+          {/* Submit Button */}
+          <button 
+            type="submit" 
+            disabled={loading} 
+            className="w-full py-2.5 bg-gradient-primary hover:shadow-lg hover:shadow-primary/50 disabled:opacity-60 text-white font-semibold rounded-lg transition mb-4"
+          >
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+
+          {/* Demo Info */}
+          <div className="p-4 bg-slate-700/20 border border-slate-600/30 rounded-lg text-xs">
+            <p className="text-slate-400 mb-2"><strong>📝 Demo Credentials:</strong></p>
+            <p className="text-slate-500 font-mono">user@example.com / password123</p>
+          </div>
+        </form>
+
+        {/* Footer */}
+        <p className="text-center text-slate-500 text-xs mt-6">
+          Protected by secure authentication
+        </p>
+      </div>
     </div>
   );
 }

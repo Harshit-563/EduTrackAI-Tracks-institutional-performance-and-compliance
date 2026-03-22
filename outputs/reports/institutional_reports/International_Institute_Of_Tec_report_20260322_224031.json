@@ -1,0 +1,84 @@
+{
+  "header": {
+    "generated_date": "2026-03-22T22:40:31.218506",
+    "report_type": "Institutional Evaluation Report",
+    "system": "EduTrack"
+  },
+  "executive_summary": {
+    "college_name": "International Institute Of Technology And Business",
+    "state": "Haryana",
+    "city": "Jhundpur",
+    "college_type": "Private",
+    "report_date": "2026-03-22",
+    "report_time": "22:40:31",
+    "metrics": {
+      "total_students": 104,
+      "total_faculty": 46,
+      "student_faculty_ratio": 2.26,
+      "placement_rate": 98.73,
+      "average_fees": 165333,
+      "fund_utilization": 96.77,
+      "infrastructure_area": 12.0
+    },
+    "scores": {
+      "overall_performance_score": 82.54,
+      "faculty_adequacy": 98.49,
+      "placement_category": "Excellent",
+      "infrastructure_quality": 20.0,
+      "financial_efficiency": 96.77,
+      "avg_doc_dss": 98.19,
+      "dss_category": "Excellent",
+      "document_completeness": 100.0
+    }
+  },
+  "risk_assessment": {
+    "risk_level": "LOW RISK",
+    "risk_color": "Green",
+    "overall_score": 82.54,
+    "compliance_risk": "NO",
+    "missing_documents": 0,
+    "recommendations": [
+      "Upgrade infrastructure and facilities"
+    ]
+  },
+  "performance_analysis": {
+    "overall_performance_score": 82.54,
+    "placement_rate": 98.73,
+    "percentile_overall": 99.9,
+    "percentile_placement": 99.9,
+    "state_rank": 237,
+    "state_rank_total": 237,
+    "national_rank": "4827",
+    "national_rank_total": 4831,
+    "performance_trend": "Stable"
+  },
+  "detailed_metrics": {
+    "academic_metrics": {
+      "student_faculty_ratio": 2.26,
+      "faculty_adequacy_score": 98.49,
+      "total_students": 104,
+      "total_faculty": 46,
+      "placement_rate": 98.73,
+      "placement_category": "Excellent"
+    },
+    "infrastructure_metrics": {
+      "campus_size": "12 Acres",
+      "infrastructure_area": 12.0,
+      "infrastructure_quality_score": 20.0,
+      "infrastructure_per_student": 0.12
+    },
+    "financial_metrics": {
+      "average_fees": 165333,
+      "fee_category": "Medium",
+      "fund_utilization": 96.77,
+      "financial_efficiency_score": 96.77
+    },
+    "compliance_metrics": {
+      "avg_doc_dss": 98.19,
+      "dss_category": "Excellent",
+      "missing_documents": 0,
+      "document_completeness": 100.0,
+      "high_compliance_risk": "NO"
+    }
+  }
+}

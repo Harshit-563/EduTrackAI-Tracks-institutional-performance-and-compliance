@@ -57,5 +57,31 @@ const client = {
   post: (path, body, headers = {}) => request(path, { method: "POST", body, headers }),
 };
 
+// ML Model Endpoints
+export const ml = {
+  // Health Check
+  checkHealth: () => client.get("/health"),
+
+  // Risk Prediction
+  predictRisk: (institutionData) => 
+    client.post("/predict/risk", institutionData),
+
+  // Performance Prediction
+  predictPerformance: (institutionData) => 
+    client.post("/predict/performance", institutionData),
+
+  // Anomaly Detection
+  detectAnomalies: (institutionData) => 
+    client.post("/predict/anomaly", institutionData),
+
+  // Comprehensive Evaluation
+  evaluateInstitution: (institutionData) => 
+    client.post("/evaluate/institution", institutionData),
+
+  // Batch Evaluation
+  batchEvaluate: (institutions) => 
+    client.post("/batch/evaluate", { institutions }),
+};
+
 export default client;
 
