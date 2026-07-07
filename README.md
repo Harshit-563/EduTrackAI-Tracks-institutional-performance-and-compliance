@@ -26,50 +26,148 @@ On top of that pipeline, EduTrack includes a React dashboard for reviewers, inst
 ## Architecture
 
 ```text
-Frontend (React + Vite)
-    |
-    +-- Review dashboard
-    +-- Upload workflow
-    +-- Analytics and rank list
-    |
-FastAPI Services
-    |
-    +-- Workflow API
-    |     - auth
-    |     - upload and analyze
-    |     - reviewer queue
-    |     - institution overview
-    |
-    +-- ML Scoring API
-          - risk prediction
-          - performance prediction
-          - anomaly detection
-          - batch evaluation
-    |
-Core Processing
-    |
-    +-- OCR engine
-    +-- document predictor
-    +-- compliance aggregation
-    +-- risk and anomaly models
-    +-- report generation
+                ┌────────────────────────┐
+                │   Document Upload UI   │
+                └──────────┬─────────────┘
+                           ↓
+
+┌──────────────────────────────────────────────────┐
+│ LAYER 1: DOCUMENT TRUST & COMPLIANCE (Per-Doc)  │
+│                                                  │
+│ OCR → Rule Validation → (Optional) LLM Assist   │
+│                                                  │
+│ Output:                                          │
+│  - DSS Score (0–100)                             │
+│  - Classification (Valid / Review)               │
+│  - Flags (explainable issues)                    │
+└──────────┬───────────────────────────────────────┘
+           ↓ (Aggregated per institution)
+
+┌──────────────────────────────────────────────────┐
+│ LAYER 2: INSTITUTION COMPLIANCE SCORING         │
+│                                                  │
+│ Aggregates all document results:                 │
+│  - Missing mandatory documents?                  │
+│  - Expired / weak documents?                     │
+│  - Average DSS score                             │
+│                                                  │
+│ Output:                                          │
+│  - Compliance Index (0–100)                      │
+│  - Status (Compliant / Review Required)          │
+│  - Actionable reasons                            │
+└──────────┬───────────────────────────────────────┘
+           ↓ (Structured institutional metrics)
+
+┌──────────────────────────────────────────────────┐
+│ LAYER 3: RISK & ANOMALY DETECTION (ML Layer)    │
+│                                                  │
+│ Isolation Forest (unsupervised anomaly model)    │
+│                                                  │
+│ Evaluates:                                       │
+│  - Student–Faculty ratio                         │
+│  - Placement rate                                │
+│  - Infrastructure per student                    │
+│  - Compliance score                              │
+│                                                  │
+│ Output:                                          │
+│  - Risk score (0–100)                            │
+│  - Risk status (Normal / High Risk)              │
+│  - Anomaly flags                                 │
+└──────────────────────────────────────────────────┘
 ```
 
-## Tech Stack
 
-- Python
-- FastAPI
-- Scikit-learn
-- Pandas and NumPy
-- Tesseract OCR
-- React
-- Vite
-- Tailwind CSS
-- Recharts
+🏫 EduTrack — AI-Based Institutional Compliance & Risk System
 
-## Repository Structure
+EduTrack is an AI-driven Decision Support System (DSS) that validates institutional documents, evaluates compliance, and detects risk using explainable scoring and anomaly detection.
 
-```text
+It is designed for regulatory bodies such as AICTE, UGC, NAAC, and accreditation boards.
+
+🚀 Features
+
+📄 PDF & Image document upload
+
+🔍 OCR-based document text extraction
+
+📊 Document Sufficiency Score (DSS)
+
+🏛 College-level compliance aggregation
+
+🤖 ML-based anomaly detection (Isolation Forest)
+
+📈 Institutional risk scoring (0–100)
+
+🧾 Explainable flags at every layer
+
+🏆 College ranking support
+
+🧠 How It Works
+
+EduTrack follows a 3-layer architecture:
+
+Document Layer → Compliance Layer → Risk Layer
+
+1️⃣ Document Validation
+
+Extracts text via OCR
+
+Checks for:
+
+Date presence
+
+Signature presence
+
+Required keywords
+
+Generates DSS score (0–100)
+
+Example:
+
+{
+  "dss_score": 35,
+  "flags": ["missing_date", "missing_signature"],
+  "classification": "Needs Review"
+}
+
+2️⃣ College Compliance Aggregation
+
+Combines multiple document DSS scores
+
+Applies weighted scoring for mandatory documents
+
+Outputs compliance score
+
+Example:
+
+{
+  "college_compliance_score": 64.5,
+  "status": "Review Required"
+}
+
+3️⃣ Risk Engine (ML-Based)
+
+Uses Isolation Forest (unsupervised anomaly detection)
+
+Evaluates:
+
+Student–Faculty ratio
+
+Placement rate
+
+Infrastructure per student
+
+Compliance score
+
+Outputs risk score (0–100)
+
+Example:
+
+{
+  "risk_score": 43.03,
+  "status": "Normal"
+}
+
+📂 Project Structure
 edutech/
 |-- backend/                  # Additional backend setup docs
 |-- data/                     # Raw and processed datasets
@@ -224,42 +322,75 @@ To run the scripted document-to-risk workflow:
 
 ```bash
 python run_full_pipeline.py
-```
 
-This pipeline demonstrates:
+📊 Dataset
 
-- OCR on sample institutional documents
-- per-document DSS scoring
-- institution-level compliance aggregation
-- final risk prediction and decision support output
+The system uses a college dataset including:
 
-## Sample Outputs
+Total Students
 
-The repository already contains generated artifacts under `outputs/`, including:
+Total Faculty
 
-- institutional HTML and JSON reports
-- risk assessment CSV outputs
-- analytics visualizations
-- derived institutional scores
+Placement Rate
 
-## Why This Project Matters
+Infrastructure Area
 
-EduTrack is designed to support regulator-safe and human-review-first decision making. Instead of producing black-box outputs, it emphasizes traceable scores, review flags, and institution-level summaries that can help teams:
+Rating
 
-- reduce manual document screening time
-- prioritize high-risk submissions
-- compare institutions consistently
-- support accreditation and compliance audits with explainable evidence
+Fees
 
-## Future Improvements
+Location
 
-- Database-backed persistence instead of in-memory demo data
-- Role-based access hardening and production auth
-- Real-time dashboard updates
-- Improved OCR extraction for more document types
-- Better deployment separation between workflow and scoring services
-- Expanded reporting and audit trails
+Establishment Year
 
-## License
+Derived features:
 
-Add your preferred license here before publishing the repository.
+Student–Faculty Ratio
+
+Infrastructure per student
+
+Avg Document DSS
+
+Missing Document Count
+
+🛡 Design Principles
+
+Explainable AI (no black-box decisions)
+
+Human-review-first approach
+
+Modular architecture
+
+Scalable document types
+
+Regulator-safe decision support
+
+🔮 Future Improvements
+
+FastAPI backend deployment
+
+Role-based review system
+
+PDF audit report generation
+
+Real-time dashboard updates
+
+Graph-based fraud detection
+
+👨‍💻 Tech Stack
+
+Python
+
+Scikit-Learn
+
+Pandas & NumPy
+
+Tesseract OCR
+
+pdf2image
+
+React (Frontend)
+
+
+
+
