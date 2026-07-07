@@ -17,3 +17,34 @@ __pycache__
 backend\__pycache__
 edutrack-frontend\node_modules
 edutrack-frontend\dist
+
+# Virtual environments
+.venv/
+.venv-1/
+
+# Local env files
+.env.local
+.env
+doc_validator/.env
+
+# Build/artifacts
+dist/
+*.db
+*.sqlite
+*.pkl
+
+# Python cache
+.pytest_cache/
+.mypy_cache/
+__pycache__/
+*.pyc
+
+# Logs
+logs/
+
+# Editor
+.vscode/
+.DS_Store
+
+# node
+node_modules/

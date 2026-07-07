@@ -23,6 +23,7 @@ export default function Dashboard() {
     fund_utilization: 82,
     missing_doc_count: 2,
     avg_doc_dss: 78,
+    dss: 78,
   });
 
   const [predictions, setPredictions] = useState(null);
@@ -35,7 +36,7 @@ export default function Dashboard() {
   const checkAPIHealth = async () => {
     try {
       const response = await ml.checkHealth();
-      if (response.data.status === "healthy") {
+      if (response.data.status === "ok") {
         setBasicHealth(true);
       }
     } catch (err) {
