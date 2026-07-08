@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from src.auth.dependencies import require_roles
-from src.core.exceptions import ServerError, ValidationError
 from src.database import get_db
 from src.database.models import UserRole
 from src.services.upload_service import UploadService
@@ -26,7 +25,7 @@ async def upload_analyze(
 ) -> dict[str, Any]:
     try:
         return await upload_service.upload_and_analyze(file, user, db, institution_id=institution_id)
-    except (HTTPException, ValidationError, ServerError):
+    except HTTPException:
         raise
     except Exception as exc:
-        raise ServerError(detail=f"Upload analyze failed: {exc}") from exc
+        raise HTTPException(status_code=500, detail=f"Upload analyze failed: {exc}")

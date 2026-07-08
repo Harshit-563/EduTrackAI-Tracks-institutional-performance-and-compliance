@@ -12,7 +12,6 @@ from sqlalchemy.orm import Session
 from src.core.config import settings
 from src.database.models import DocumentStatus
 from src.database.repositories import DocumentRepository
-from src.database.transaction import transactional
 from src.services.audit_service import AuditService
 from src.services.pipeline_service import DocumentProcessingDispatcher
 from utils.logger import setup_logger
@@ -69,31 +68,31 @@ class UploadService:
         content_hash = hashlib.sha256(content).hexdigest()
 
         repository = DocumentRepository(db)
-        with transactional(db):
-            document = repository.create(
-                submission_code=document_code,
-                institution_id=resolved_institution_id,
-                doc_type="pending_classification",
-                original_filename=file.filename,
-                storage_path=str(storage_path),
-                mime_type=file.content_type,
-                content_hash=content_hash,
-                status=DocumentStatus.QUEUED,
-                uploaded_by=user["user_id"],
-                flags=[],
-                extracted_fields={},
-                metadata_json={"content_length": len(content)},
-            )
+        document = repository.create(
+            submission_code=document_code,
+            institution_id=resolved_institution_id,
+            doc_type="pending_classification",
+            original_filename=file.filename,
+            storage_path=str(storage_path),
+            mime_type=file.content_type,
+            content_hash=content_hash,
+            status=DocumentStatus.QUEUED,
+            uploaded_by=user["user_id"],
+            flags=[],
+            extracted_fields={},
+            metadata_json={"content_length": len(content)},
+        )
 
-            self.audit_service.log(
-                db,
-                action="document.uploaded",
-                entity_type="document",
-                entity_id=document.submission_code,
-                user_id=user["user_id"],
-                document_id=document.id,
-                payload={"filename": file.filename, "mime_type": file.content_type},
-            )
+        self.audit_service.log(
+            db,
+            action="document.uploaded",
+            entity_type="document",
+            entity_id=document.submission_code,
+            user_id=user["user_id"],
+            document_id=document.id,
+            payload={"filename": file.filename, "mime_type": file.content_type},
+        )
+        db.commit()
 
         logger.info("Document upload initiated by %s: %s", user["email"], file.filename)
         return self.dispatcher.dispatch(document.id, db)

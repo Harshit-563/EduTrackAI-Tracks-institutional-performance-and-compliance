@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 
 from src.api.v1.schemas import ReviewActionPayload
 from src.auth.dependencies import require_roles
-from src.core.exceptions import ServerError, ValidationError
 from src.database import get_db
 from src.database.models import UserRole
 from src.services.review_service import ReviewService
@@ -25,10 +24,10 @@ def reviewer_queue(
 ):
     try:
         return review_service.get_reviewer_queue(user, limit, offset, db)
-    except (HTTPException, ValidationError, ServerError):
+    except HTTPException:
         raise
     except Exception as exc:
-        raise ServerError(detail=f"Failed to retrieve queue: {exc}") from exc
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve queue: {exc}")
 
 
 @router.get("/reviewer/document/{submission_id}")
@@ -39,10 +38,10 @@ def reviewer_document(
 ):
     try:
         return review_service.get_submission(submission_id, user, db)
-    except (HTTPException, ValidationError, ServerError):
+    except HTTPException:
         raise
     except Exception as exc:
-        raise ServerError(detail=f"Failed to retrieve document: {exc}") from exc
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve document: {exc}")
 
 
 @router.post("/reviews/{submission_id}/action")
@@ -54,7 +53,7 @@ def review_action(
 ):
     try:
         return review_service.submit_review_action(submission_id, payload, user, db)
-    except (HTTPException, ValidationError, ServerError):
+    except HTTPException:
         raise
     except Exception as exc:
-        raise ServerError(detail=f"Failed to submit review: {exc}") from exc
+        raise HTTPException(status_code=500, detail=f"Failed to submit review: {exc}")

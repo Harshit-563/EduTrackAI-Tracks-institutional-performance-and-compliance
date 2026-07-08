@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 from src.api.v1.schemas import ReviewActionPayload
 from src.database.models import DocumentStatus
 from src.database.repositories import DocumentRepository, ReviewActionRepository
-from src.database.transaction import transactional
 from src.services.audit_service import AuditService
 from utils.logger import setup_logger
 
@@ -47,24 +46,25 @@ class ReviewService:
         }
 
         try:
-            with transactional(db):
-                repository.update_status(document, status_map[payload.action])
-                ReviewActionRepository(db).create(
-                    document_id=document.id,
-                    reviewer_id=user["user_id"],
-                    action=payload.action,
-                    notes=payload.notes,
-                )
-                audit_service.log(
-                    db,
-                    action="document.reviewed",
-                    entity_type="document",
-                    entity_id=document.submission_code,
-                    user_id=user["user_id"],
-                    document_id=document.id,
-                    payload={"action": payload.action, "notes": payload.notes},
-                )
+            repository.update_status(document, status_map[payload.action])
+            ReviewActionRepository(db).create(
+                document_id=document.id,
+                reviewer_id=user["user_id"],
+                action=payload.action,
+                notes=payload.notes,
+            )
+            audit_service.log(
+                db,
+                action="document.reviewed",
+                entity_type="document",
+                entity_id=document.submission_code,
+                user_id=user["user_id"],
+                document_id=document.id,
+                payload={"action": payload.action, "notes": payload.notes},
+            )
+            db.commit()
         except Exception:
+            db.rollback()
             raise
 
         logger.info("Review submitted for %s by %s: %s", submission_id, user["email"], payload.action)

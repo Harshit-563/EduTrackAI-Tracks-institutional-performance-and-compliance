@@ -1,50 +1,71 @@
-doc_validator\.env
-doc_validator\__pycache__
-doc_validator/.env:1
-doc_validator\.env:1
-college_data_v2.csv
-college_data_v3.csv
-college_data.csv
-doc_validator\.env
-fire_cert.pdf
-generate_data.py
-scaler.pkl
-college_aggregator.py
-test_fire_cert.jpg
-package-lock.json
-__pycache__
+# Local environment and secrets
 .env
-backend\__pycache__
-edutrack-frontend\node_modules
-edutrack-frontend\dist
+.env.*
+*.env.local
+doc_validator/.env
+doc_validator/.env.local
+.DS_Store
+Thumbs.db
 
-# Virtual environments
+# Python caches and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Python virtual environments
 .venv/
 .venv-1/
+venv/
+ENV/
+env/
+env.bak/
+.venv*/
 
-# Local env files
-.env.local
-.env
-doc_validator/.env
-
-# Build/artifacts
+# Distribution / packaging
+build/
 dist/
-*.db
-*.sqlite
-*.pkl
+*.egg-info/
+.eggs/
+*.egg
+*.whl
 
-# Python cache
-.pytest_cache/
-.mypy_cache/
-__pycache__/
+# Node / frontend
+edutrack-frontend/node_modules/
+edutrack-frontend/dist/
+edutrack-frontend/.vite/
+edutrack-frontend/npm-debug.log*
+edutrack-frontend/yarn-debug.log*
+edutrack-frontend/yarn-error.log*
+
+# Logs and runtime files
+*.log
+logs/
+*.pid
+*.seed
+*.sqlite3
+*.sqlite
+*.db
+*.db-journal
+
+# IDE/editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*~
+
+
+# OS files
+*.tmp
+*.temp
+*.bak
+*.csv
 *.pyc
 
-# Logs
-logs/
-
-# Editor
-.vscode/
-.DS_Store
-
-# node
-node_modules/
+# Optional generated files
+package-lock.json
+doc_validator\__pycache__

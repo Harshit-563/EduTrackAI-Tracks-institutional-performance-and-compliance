@@ -12,8 +12,6 @@ from src.database.models import DocumentStatus, PredictionType
 from src.database.repositories import AIPredictionRepository, DocumentRepository, NotificationRepository
 from src.services.audit_service import AuditService
 from src.services.document_classification_service import DocumentClassificationService
-from src.services.entity_extraction_service import EntityExtractionService
-from src.services.layout_extraction_service import LayoutExtractionService
 from src.services.report_service import ReportService
 from src.services.search_service import SemanticSearchService
 from utils.logger import setup_logger
@@ -39,8 +37,6 @@ logger = setup_logger(__name__)
 class DocumentPipelineService:
     def __init__(self):
         self.classifier = DocumentClassificationService()
-        self.layout_extractor = LayoutExtractionService()
-        self.entity_extractor = EntityExtractionService()
         self.predictor = ModelPredictor()
         self.report_service = ReportService()
         self.search_service = SemanticSearchService()
@@ -72,8 +68,6 @@ class DocumentPipelineService:
             ocr_output["doc_type"] = classification["label"]
 
             validation = self._run_validation(ocr_output)
-            layout_output = self.layout_extractor.extract_layout_and_tables(full_text)
-            entity_output = self.entity_extractor.extract_entities(full_text)
             compliance_analysis = self._run_compliance(full_text, classification["label"], document.institution.name if document.institution else None)
             compliance_score = self._calculate_compliance(document, validation, compliance_analysis)
             predictions = self._run_predictions(document, validation, compliance_score)
@@ -82,11 +76,7 @@ class DocumentPipelineService:
             document.classification_label = classification["label"]
             document.classification_confidence = classification["confidence"]
             document.ocr_text = full_text
-            document.extracted_fields = {
-                **(validation.get("fields", {}) or {}),
-                "layout": layout_output,
-                "entities": entity_output,
-            }
+            document.extracted_fields = validation.get("fields", {}) or {}
             document.dss_score = float(validation.get("dss_score", 0) or 0)
             document.compliance_score = compliance_score
             document.flags = sorted(
@@ -113,8 +103,6 @@ class DocumentPipelineService:
                     "status": document.status.value,
                 },
                 "validation": validation,
-                "layout_analysis": layout_output,
-                "entity_extraction": entity_output,
                 "compliance_analysis": compliance_analysis,
                 "predictions": predictions,
             }

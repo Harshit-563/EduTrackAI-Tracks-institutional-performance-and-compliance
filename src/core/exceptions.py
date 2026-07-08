@@ -3,8 +3,8 @@ Custom exception classes and handlers for consistent error responses.
 """
 
 from fastapi import FastAPI, Request, status
-from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 
 
 class EduTrackException(Exception):
@@ -72,18 +72,6 @@ def register_exception_handlers(app: FastAPI):
             },
         )
     
-    @app.exception_handler(RequestValidationError)
-    async def request_validation_error_handler(request: Request, exc: RequestValidationError):
-        return JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content={
-                "status": "error",
-                "error": "Validation failed",
-                "detail": exc.errors(),
-                "path": str(request.url.path),
-            },
-        )
-
     @app.exception_handler(ValidationError)
     async def validation_error_handler(request: Request, exc: ValidationError):
         return JSONResponse(

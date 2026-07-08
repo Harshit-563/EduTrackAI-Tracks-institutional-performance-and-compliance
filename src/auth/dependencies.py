@@ -29,19 +29,6 @@ def get_current_user(
     return auth_service.get_current_user(token, db)
 
 
-def get_optional_current_user(
-    authorization: str | None = Header(default=None),
-    db: Session = Depends(get_db),
-):
-    if not authorization:
-        return None
-    try:
-        token = _extract_bearer_token(authorization)
-        return auth_service.get_current_user(token, db)
-    except HTTPException:
-        return None
-
-
 def require_roles(*roles: UserRole) -> Callable:
     def dependency(user=Depends(get_current_user)):
         if user["role"] not in {role.value for role in roles}:
